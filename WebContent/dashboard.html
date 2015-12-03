@@ -1,0 +1,321 @@
+<html>
+  <head>
+  	<link href="css/default.css" rel="stylesheet" type="text/css">
+  	<link href="css/jquery-ui.css" rel="stylesheet" type="text/css">
+  	
+  	<script src="js/jquery-1.9.1.js"></script>
+  	<script src="js/jquery-ui-1.10.3.custom.js"></script>
+  	
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="js/dashboard_controller.js" ></script>
+    <script type="text/javascript" src="js/dashboard_controller2.js" ></script>
+
+    
+<!--     <script type="text/javascript"> 
+     $(function(){
+         $("#singlePatientDataContainer").load("single_patient_data.html"); 
+      });
+ </script> -->
+    
+  </head>
+  <body>
+
+  <div id="dashboard_container">
+  	<div style="float: left;">	<img src="images/mosaicLogo.png" width="170" height="39"/></div>
+	<div style="float: right; margin-top:5px;"><span class="logoutLabel" onclick="history.go(-1);">Logout</span></div>
+  	<div style="clear: both;"></div>
+  	<div id="menu_container">
+  		<div id="menu_return" class="menu_return" onclick="history.go(-1);" title="Return to Home">
+  			<span class="menu_item_label" >Home</span>
+  		</div>
+  		<div id="menu_item_1" class="menu_item menu_item_selected" onclick="loadGeneralChartSection();">
+  			<span class="menu_item_label">General Charts</span>
+  		</div>
+  	<!--  	<div id="menu_item_2" class="menu_item">
+  			<span class="menu_item_label">Process Results</span>
+  		</div>
+  		<div id="menu_item_3" class="menu_item">
+  			<span class="menu_item_label">Drill Down Results</span>
+  		</div>-->
+  		<div id="menu_item_4" class="menu_item" onclick="loadCenterProfilingSection();">
+  			<span class="menu_item_label">Center Profiling</span>
+  		</div>
+  		<div id="menu_item_5" class="menu_item" onclick="loadPatientSection();">
+  			<span class="menu_item_label">UC3 - Patient</span>
+  		</div>
+  		
+  		<div id="menu_filter_item" class="menu_section_item_indent" title="Selection Filters">
+  			<span class="menu_item_label" >Filters</span>
+  		</div>
+  		<div id="step_item_0" class="step_item">
+  			<span class="menu_item_label">No Filters Selected</span>
+  		</div>
+  		<div id="step_item_1" class="step_item">
+  			<span class="menu_item_label">Step 1</span>
+  		</div>
+  		<div id="step_item_2" class="step_item">
+  			<span class="menu_item_label">Step 2</span>
+  		</div>
+  		<div id="step_item_3" class="step_item">
+  			<span class="menu_item_label">Step 3</span>
+  		</div>
+  		
+  		<div id="menu_info_item" class="menu_section_item_indent" title="Info">
+  			<span class="menu_item_label" >Info</span>
+  		</div>
+  		<div id="menu_info_tooltip" class="info_class">
+  			<div id="step_1_info" class="parent more" style="padding:5px;"> Pie charts show patient counts grouped by 
+  			Demographic variables, BMI, Risk indexes at the last visit and Complication distribution. 
+  			 <div>Clicking on a chart section the temporal data mining algorithm  extracts 
+  			 careflows and shows complication distributions of the selected group of patients.</div></div>
+  			<div id="step_2_info" class="parent more" style="padding:5px;">Graphs show the most frequent temporal patterns of the population selected in the previous step. 
+  			Applied selection criteria are shown in the 'Filters' section. 
+    		<div>For further information on the specific patterns, please check the 'Info about...' link.</div>
+    </div>
+  			<div id="step_3_info" style="padding:5px;">Pie charts show the complication distributions of the patients belonging to the selected step. 
+  			The Histogram shows the distribution of the durations of the selected step in the temporal pattern. 
+  			The bar chart shows the duration of the selected step for each patient. Applied selection criteria are shown in the 'Filters' section.</div>
+
+  			<div id="step_4_info" class="parent more" style="padding:5px;">Histograms show the number of patients that have developed one 
+  			of the listed complication before or after the first visit near the hospital. <div>The first graph 'First Complication'
+  			 shows this information considering for each patient the first developed complication. </div></div>
+  			<div id="step_5_info" style="padding:5px;">This use case aims at managing single patient during follow up visits. 
+  			The dashboard  depicts in a graphic way clinical information and behavioral patterns of clinical and administrative data.</div>
+  			<div id="step_6_info" class="parent more" style="padding:5px;">Traffic lights show clinical variables and risk values profiles. 
+  			<div>The color of the traffic light indicates if the variable was in range or not at the last follow up. 
+  			The arrow indicates the trend between the last two follow ups.</div></div>
+  			<div id="step_7_info" class="parent more"style="padding:5px;">Graphs show clinical variables, complications and risk profiles from the first visit near the hospital.
+  			<div>Scatter plots show the variables measures during follow ups.
+  			Time line plots show temporal abstractions. Weight temporal abstractions indicate if the measures Increase, 
+  			Decrease or stay Steady. Time to target indicates that the patient has a 10%decrease of its weight in 6 months. 
+  			Diet temporal abstraction indicate if the patient follow a good or bad diet regiment and for how long. </div></div>
+  			<div id="step_8_info" class="parent more" style="padding:5px;">Graphs show the purchases of drugs during the disease evolution.
+  			<div>Drug purchases graphs indicate the number of days supply associated to purchases for a specific active principle. 
+  			The grey box below the graph indicates whether the patient purchases larger or smaller quantities of the drug, 
+  			compared to other patients that are treated with the same drug.
+  			Therapy purchasing behaviour graphs specify, with a 6 month granularity, the number of days with drug on hand divided 
+  			by the number of days in each time interval. OVER labels indicate a value  greater than 100%</div>
+  			</div>
+  	</div>
+  		
+  		 <div id="menu_filter_item" class="menu_section_item_indent" title="Help">
+  			<span class="menu_item_label" >Help</span>
+  		</div>
+  		<div id="menu_tooltip" class="info_class">
+  			<div id="step_1_tooltip" style="padding:5px;">Click on pie chart sections to view the associated temporal patterns. In Complications, uncheck 'Direct process' to view the detailed complication pies.</div>
+  			<div id="step_2_tooltip" style="padding:5px;">Click on a section of the timeline charts to view information on patients experiencing the history</div>
+  			<div id="step_3_tooltip" style="padding:5px;">Click on a bar on the bar chart to access single patient data. Click on 'Back to Temporal Patterns' to return to the previous step.</div>
+  			<div id="step_4_tooltip" style="padding:5px;">To zoom in select a section of the graph. To zoom out right click on the same graph.</div>
+  			<div id="step_5_tooltip" style="padding:5px;">Type name or surname of a patient to access his/her data.</div>
+  			<div id="step_6_tooltip" style="padding:5px;">Access to other information through the buttons at the top of the screen. Click on 'View Details' to view an extended time series of the variable. </div>
+  			<div id="step_7_tooltip" style="padding:5px;">Access to other information through the buttons at the top of the screen. Move the mouse over the graphs to show more information.</div>
+  			<div id="step_8_tooltip" style="padding:5px;">Access to other information through the buttons at the top of the screen. Move the mouse over the graphs to show more information. Scroll down to view Therapy Purchasing Behaviour</div>
+  		</div>
+  		
+  		
+  	</div>
+  	<div id="chart_container">
+  		 <div id="loader" class="loader">
+  			<img src="images/ajax-loader.gif" />
+  			<br>
+  			<div>Loading chart...</div>
+  		</div>
+			<!-- START: SINGLE PATIENT MENU -->
+			<!--<div id="ucMenu" class="chart_item_tab step_zero">
+				<div id="summaryTab" class="singlePatientMenuItemSelected"
+					onclick="loadGeneralChart();" id="ucMenu0">
+					<span class="singlePatientMenuItemLabelSelected">Summary</span>
+				</div>
+				<div id="centerProfilingTab" class="singlePatientMenuItem"
+					onclick="loadCenterProfilingSection();" id="ucMenu1">
+					<span class="singlePatientMenuItemLabel">Center Profiling</span>
+				</div>
+				<div style="clear: both;"></div>
+			</div>  -->
+			<!-- END: SINGLE PATIENT MENU -->
+			<!--  <div class="step_zero"  style="width: 100%; height:70px; background-color:#AE2233;">--> 
+			<!-- multistep form -->
+<form id="msform" class="step_zero">
+	<!-- progressbar -->
+	<ul id="progressbar">
+		<li class="active">Selection</li>
+		<li>Temporal Patterns</li>
+		<li>Drill Down</li>
+	</ul>
+			</form>
+			<!-- </div>  -->
+			<div style="clear: both;"></div>
+			<div class="chart_item step_one" >
+  			<div class="chart_title" align="center">Gender</div>
+  			<div class="chart" id="gender_chart"></div>
+  			<div class="chart_inner_btn" onclick="drillDownAllPatients();" align="right">Select all patients</div>
+  		</div>
+		<div class="chart_item step_one">
+  			<div class="chart_title" align="center">Age at Diagnosis</div>
+  			<div class="chart" id="agediagnosis_chart"></div>
+  			
+  		</div>
+  		<div class="chart_item step_one" >
+  			<div class="chart_title" align="center">BMI (Last Visit)</div>
+  			<div class="chart" id="bmipie_chart"></div>
+  			<div class="chart_inner_btn_hidden" align="right">.</div>
+  		</div>	
+  		  		<div class="chart_item step_one" >
+  			<div class="chart_title" align="center">Cardio Vascular Risk (Last Visit)</div>
+  			<div class="chart" id="cvr_chart"></div>
+  			
+  		</div>  
+  		<div class="chart_item step_one" id="comorb_chart_container">
+  			<div class="chart_title" align="center">Complications</div>
+  			<div class="chart" id="comorb_chart"></div>
+  			<div class="chart_inner_btn" align="right">Direct process<input type='checkbox' id='comorbidity_cb' checked /></div>
+  		</div>	
+  		<div class="chart_item step_one" id="comorb_chart_ex_container">
+  			<div class="chart_title">Complications Explode</div>
+  			<div class="chart" id="comorb_chart_ex"></div>
+  			<div class="chart_inner_btn" id ="comorbidity_back" onclick="backToComorbidityClasses();" align="right">Back to Comorbidity Classes</div>
+  		</div>
+  			
+  		<div class="chart_item step_one" >
+  			<div class="chart_title" align="center">BMI</div>
+  			<div class="chart" id="bmi_chart"></div>
+  		</div>	
+  		
+  	<div class="step_two">
+  		<div id="singleStepTwoMenu">
+  			<div class="singleStepTwoMenuItemSelected" onclick="selectStepTwoDataView($(this));" id="stepTwomenu1">
+					<span class="singleStepTwoMenuItemLabelSelected">Complications</span>
+			</div>
+			<div class="singleStepTwoMenuItem" onclick="selectStepTwoDataView($(this));" id="stepTwomenu2">
+					<span class="singleStepTwoMenuItemLabel">Drug</span>
+			</div>
+			<div class="singleStepTwoMenuItem" onclick="selectStepTwoDataView($(this));" id="stepTwomenu3">
+					<!--<span class="singleStepTwoMenuItemLabel">Hospitalization and LOC</span> -->
+					<span class="singleStepTwoMenuItemLabel">Hospitalizations, LOC, CVR</span>
+			</div>
+			<div style="clear: both;"></div>
+		</div>
+  		<div class="step_two_two" >	</div>
+  	</div>
+  		
+  		 <div class="chart_item step_three" >
+  			<div class="chart_title">Complication Categories</div>
+  			<div class="chart_subtitle">Distribution of complications</div>
+  			<div class="chart" id="drill_down_comorb_chart"></div>
+  			<div class="chart_inner_btn" onclick="backToProcess();" align="right">Back to Temporal Patterns</div>
+  		</div>
+  		
+  		 <div class="chart_item step_three" >
+  			<div class="chart_title">Complication Details</div>
+  			<div class="chart_subtitle">Distribution of complications</div>
+  			<div class="chart" id="drill_down_comorb_chart_details"></div>
+  			<div class="chart_inner_btn" onclick="backToProcess();" align="right">Back to Temporal Patterns</div>
+  		</div>
+  		<div class="chart_item step_three" >
+  			<div class="chart_title">Step Duration Histogram</div>
+  			<div class="chart_subtitle">Duration distribution (days)</div>
+  			<div class="chart" id="drill_down_histogram_chart"></div>
+  			<div class="chart_inner_btn" onclick="backToProcess();" align="right">Back to Temporal Patterns</div>
+  		</div>
+
+		<div class="chart_item step_three" >
+  			<div class="chart_title">Step Duration</div>
+  			<div class="chart_subtitle">Duration for each patient</div>
+  			<div class="chart" id="drill_down_timetocomp_chart"></div>
+  			<div class="chart_inner_btn" onclick="backToProcess();" align="right">Back to Temporal Patterns</div>
+  		</div>
+  		
+  		
+  		<!-- Single Patient Data page inclusion -->
+  		<div id="centerProfilingContainer">
+			<div class="chart_item step_four">
+				<div class="chart_title">First Complication</div>
+				<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+				<div class="chart" id="generic_time_to_complication_chart"></div>
+				<!-- <div class="chart_inner_btn" onclick="alert('all patient selected');" align="right">Select all patients</div>-->
+			</div>
+			<div class="chart_item step_four">
+				<div class="chart_title">Acute Myocardial Infarction</div>
+				<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+				<div class="chart" id="ami_chart"></div>
+				<!--  <div class="chart_inner_btn" onclick="alert('all patient selected');" align="right">Select all patients</div>-->
+			</div>
+			<div class="chart_item step_four">
+			<div class="chart_title">Angina</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="ang_chart"></div>
+			<!--<div class="chart_inner_btn" onclick="alert('all patient selected');" align="right">Select all patients</div>-->
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Chronic Ischemic Heart Disease</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="cihd_chart"></div>
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Occlusion and Stenosis of Carotid
+				Artery</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="occ_chart"></div>
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Peripheral Artery Occlusive Disease</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="paod_chart"></div>
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Stroke</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="str_chart"></div>
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Diabetic Foot</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="df_chart"></div>
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Fat Liver Disease</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="fld_chart"></div>
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Neuropathy</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="neu_chart"></div>
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Nephropathy</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="neph_chart"></div>
+		</div>
+		<div class="chart_item step_four">
+			<div class="chart_title">Retinopathy</div>
+			<!-- <div class="chart_subtitle">lorem ipsum</div> -->
+			<div class="chart" id="ret_chart"></div>
+		</div>
+  		</div>
+  		
+  		<!-- PATIENT DATA CONTAINER -->
+  		<div id="singlePatientDataContainer">
+  			<div title="Patient Search">
+  				<span class="menu_item_label" >Patient Search:</span>
+  				<input type="text" style="margin-top: 5px;" id="patientTxt">
+  				<label id="searchPatientBtn">Search</label>
+  			</div>
+  			<br>
+  			<div id = "singlePatientDataChartContainer"></div>
+  		<!-- <div id="patieSearchContainer" align="center">
+  				<input type="text" style="width: 90%; margin-top: 5px;" id="patientTxt"> <br>
+  				<div id="searchPatientBtn">Search</div>
+  			</div> -->	
+  		</div>
+  		
+  		<div style="clear: both;"></div>
+  	</div>
+  	<div style="clear: both;"></div>
+  </div>
+  
+  <div id="dialogHelp" title="chart">
+  <div id="dialogHelp_chart" style="width: 100%;"></div>
+</div>
+  </body>
+</html>

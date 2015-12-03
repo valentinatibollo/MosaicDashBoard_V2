@@ -1,0 +1,168 @@
+ 
+ <script type="text/javascript">
+$(function(){
+	$('#singlePatientDataInnerContainer').load('single_patient_data.html');
+	
+	$('#singlePatientDataInnerContainer').hide();
+	
+ 	$( "#dialogUC3chart" ).dialog({
+ 		autoOpen: false,
+ 		modal: true,
+ 		resizable: true,
+ 		width: "auto",
+ 		height: "auto",
+ 		closeText: 'hide' 
+ 	});
+});
+//function showPrice(data) {
+ //   alert("Symbol: " + data.symbol + ", Price: " + data.price);
+//}
+//var url = 'js/ticker.js'; 
+//var script = document.createElement('script');
+//script.setAttribute('src', url);
+
+// load the script
+//document.getElementById('singlePatientMenu').appendChild(script); 
+
+//jQuery.getJSON("http://localhost:8080/MosaicMiner/test.html?symbol=IBM&callback=?", 
+		//function(data) {
+		    //alert("Symbol: " + data.symbol + ", Price: " + data.price);
+		//});
+
+
+//Se non metto callback=? il metodo jquery fa una chiamata ajax!!
+	    //  var cnjRecentPosts = 'http://www.cosenonjaviste.it/api/get_recent_posts?callback=?';
+	 
+	     // $(document).ready(function() {
+	        // $.getJSON(cnjRecentPosts, function(data) {
+	         //   alert("I post recenti sono "+ data.count);
+	          //  $('<ul></ul>').appendTo('#recent_posts');
+	          //  $(data.posts).each(function(i, el) {
+	           //    $('#recent_posts ul').append('<li><a href="' + el.url + '" target="_blank">' + el.title + '</a></li>');
+	           // });
+	         //});
+	     // });
+</script> 
+
+
+
+
+
+
+
+
+
+
+
+<!-- START: SINGLE PATIENT MENU -->
+<div id="singlePatientMenu">
+	<div class="singlePatientMenuItemSelected" onclick="selectPatientDataView($(this));" id="patientmenu0">	
+		<span class="singlePatientMenuItemLabelSelected">Traffic Lights</span>
+	</div>
+	<div class="singlePatientMenuItem" onclick="selectPatientDataView($(this));" id="patientmenu1">	
+		<span class="singlePatientMenuItemLabel">Clinical data</span>
+	</div>
+	<div class="singlePatientMenuItem" onclick="selectPatientDataView($(this));" id=patientmenu2>
+		<span class="singlePatientMenuItemLabel">Therapies</span>
+	</div>
+	<div style="clear: both;"></div>
+</div>
+
+<!-- END: SINGLE PATIENT MENU -->
+
+<div id ="tl_header" class="trafficlight_page_title"></div>
+
+<div id="trafficlights_container">
+
+	<div class="trafficlight_box" id="hba1c_tl">
+		<div class="title_tl">Hba1c</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+		<!--<div class="tl_details" align="center" onclick="openUC3Chart('hba1c_tl')">View Details</div>-->
+	</div>
+	
+	<div class="trafficlight_box" id="bmi_tl">
+		<div class="title_tl">BMI</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+	</div>
+
+	<div class="trafficlight_box" id="bloodpressurediast_tl">
+		<div class="title_tl">DIASTOLIC BLOOD PRESSURE</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+	</div>
+	
+	<div class="trafficlight_box" id="bloodpressuresyst_tl">
+		<div class="title_tl">SYSTOLIC BLOOD PRESSURE</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+	</div>
+	
+	<div style="clear: both;"></div>
+	
+	<div class="trafficlight_box" id="cvr_tl">
+		<div class="title_tl">CARDIO VASCULAR RISK</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+		<!--  <div class="tl_details" align="center" onclick="openUC3Chart('cvr_tl')">View Details</div>-->
+	</div>
+	
+	<div class="trafficlight_box" id="mvr_r_tl">
+		<div class="title_tl">RETINOPATY RISK</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+	</div>
+	
+	<div class="trafficlight_box" id="mvr_ne_tl">
+		<div class="title_tl">NEPHROPATY RISK</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+	</div>
+	
+	<div class="trafficlight_box" id="mvr_nu_tl">
+		<div class="title_tl">NEUROPATY RISK</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+	</div>
+	
+	<div style="clear: both;"></div>
+		
+	<div class="trafficlight_box" id="diet_tl">
+		<div class="title_tl">DIET</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+		<!-- <div class="tl_details" align="center" onclick="openUC3Chart('diet_tl')">View Details</div>  -->
+	</div>
+	
+		<div class="trafficlight_box" id="phisicalactivity_tl">
+		<div class="title_tl">PHISICAL ACTIVITY</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+	</div>
+	
+	<div class="trafficlight_box" id="loc_tl">
+		<div class="title_tl">LEVEL OF COMPLEXITY</div>
+		<div class="content_tl"></div>
+		<div class="tl_category"></div>
+		<!--<div class="tl_details" align="center" onclick="openUC3Chart('loc_tl')">View Details</div>-->
+	</div>
+	
+
+	
+	
+	
+<!-- 	<div class="trafficlight_box" id="therapy_tl"> -->
+<!-- 		<div class="title_tl">THERAPY</div> -->
+<!-- 		<div class="content_tl"></div> -->
+<!-- 		<div class="tl_category"></div> -->
+<!-- 	</div> -->
+	
+	<div style="clear: both;"></div>
+</div>
+
+<div id="dialogUC3chart" title="chart">
+  <div id="dialogUC3chart_chart" style="width: 100%;"></div>
+</div>
+
+<div id="singlePatientDataInnerContainer"></div>

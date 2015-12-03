@@ -1,0 +1,4 @@
+MV 10.7.59.104
+mongo
+use mosaic
+db.process.update({},{$unset: {results:""}},{multi:true})

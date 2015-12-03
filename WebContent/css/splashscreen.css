@@ -1,0 +1,111 @@
+@font-face {
+font-family: MyriadPro;
+src: url("../font/MyriadPro-Regular.otf") format("opentype");
+}
+
+body{
+	background-image: url("../images/splash_bg.png");
+}
+
+header{
+	width: 1000px;
+height: 200px;
+background-color: #FFF;
+margin: 5px auto;
+}
+
+h1{
+	font-family: "Noto Sans",sans-serif;
+font-size: 12px;
+text-align: left;
+color: #666;
+padding-top: 25px;
+padding-left: 20px;
+}
+
+#white_container{
+	background-color: white;
+    height: 200px;
+    position: absolute;
+    width: 1000px;
+    margin: 25px auto;
+}
+
+#splashscreen_container {
+	position: absolute;
+    height: 150px;
+    width: 650px;
+    top:calc(50% - 150px/2); /* height divided by 2*/
+    left:calc(50% - 350px/2); /* width divided by 2*/
+ }
+#uc_one_link {
+	/*background: -moz-linear-gradient(100% 100% 90deg, #015E84, #90C8D1);
+	background: -webkit-gradient(linear, top, bottom, from(#015E84), to(#90C8D1));
+	-moz-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	-webkit-border-radius: 10px;*/
+	border-radius: 10px;
+	width: 150px;
+	height: 150px;
+	float: left;
+	cursor: pointer;
+	background: #AECBE8;
+}
+#uc_one_link span{
+	color: white;
+    font-family: MyriadPro;
+    font-size: 40px;
+    font-weight: bold;
+    left: 45px;
+    position: absolute;
+    top: 45px;
+}
+#uc_two-three_link {
+	/*background: -moz-linear-gradient(100% 100% 90deg, #EDCE6A, #CE7458);
+	background: -webkit-gradient(linear, top, bottom, from(#EDCE6A), to(#CE7458));
+	-moz-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	-webkit-border-radius: 10px;*/
+	border-radius: 10px;
+	width: 150px;
+	height: 150px;
+	float: left;
+	margin-left: 50px;
+	cursor: pointer;
+	background: #6AB7BF;
+}
+
+#uc_two-three_link span{
+	color: white;
+    font-family: MyriadPro;
+    font-size: 40px;
+    font-weight: bold;
+    left: 225px;
+    position: absolute; 
+    top: 45px;
+}
+
+#uc_time_to_compl_link {
+	background: -moz-linear-gradient(100% 100% 90deg, #499272, #75AF96);
+	background: -webkit-gradient(linear, top, bottom, from(#499272), to(#75AF96));
+	-moz-border-radius: 10px;
+	-khtml-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	width: 150px;
+	height: 150px;
+	float: left;
+	margin-left: 50px;
+	cursor: pointer;
+}
+
+#uc_time_to_compl_link span{
+	color: white;
+    font-family: MyriadPro;
+    font-size: 30px;
+    font-weight: bold;
+    left: 425px;
+    position: absolute; 
+    top: 45px;
+    width: 50px;
+}
