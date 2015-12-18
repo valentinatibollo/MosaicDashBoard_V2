@@ -23,13 +23,13 @@ function renderContainerCP(){
 //google.load("visualization", "1", {packages:["corechart", "timeline"]});
 //google.setOnLoadCallback(drawCharts);
 
-function drawChartsCP() {
+function drawChartsCP(sessionId) {
 //	hideLoaderCP();
 	hist_chart_data_json = $.ajax({
 		url: "./i2b2Servlet/",
 		dataType:"json",
 		async: false,
-		data: {step: "1",chart_type: "time_to_complication"}
+		data: {step: "1",chart_type: "time_to_complication", session_id: sessionId}
 	}).responseText;
 
 

@@ -9,6 +9,7 @@
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="js/dashboard_controller.js" ></script>
     <script type="text/javascript" src="js/dashboard_controller2.js" ></script>
+	<script type="text/javascript" src="js/debugout.js" ></script>
 
     
 <!--     <script type="text/javascript"> 
@@ -23,6 +24,7 @@
   <div id="dashboard_container">
   	<div style="float: left;">	<img src="images/mosaicLogo.png" width="170" height="39"/></div>
 	<div style="float: right; margin-top:5px;"><span class="logoutLabel" onclick="history.go(-1);">Logout</span></div>
+	<div style="float: right; margin-top:5px;"><span class="logoutLabel" onclick="bugout.downloadLog();">Download Log</span></div>
   	<div style="clear: both;"></div>
   	<div id="menu_container">
   		<div id="menu_return" class="menu_return" onclick="history.go(-1);" title="Return to Home">

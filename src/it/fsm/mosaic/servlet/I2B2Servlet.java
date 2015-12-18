@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -49,6 +50,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -59,6 +61,7 @@ import com.mongodb.util.JSON;
 
 @SuppressWarnings("serial")
 public class I2B2Servlet extends HttpServlet{
+	private static Logger log = Logger.getLogger(I2B2Servlet.class);
 
 	private static final String observationTable = "OBSERVATION_FACT";
 	private static final String observationTableOld = "OBSERVATION_FACT_OLD";
@@ -73,25 +76,38 @@ public class I2B2Servlet extends HttpServlet{
 		String chartType = req.getParameter("chart_type");
 
 		if(step.equalsIgnoreCase("1")){
+			String sessionId = req.getParameter("session_id");
 			if(chartType.equalsIgnoreCase("gender")){
+				log.info(sessionId+ "/GeneralChart_Selection/Get/GenderPieChart");
 				out.println(getI2B2GenderData());
 			}
 			else if(chartType.equalsIgnoreCase("bmi")){
+				log.info(sessionId+ "/GeneralChart_Selection/Get/BMIBarChart");
 				out.println(getI2B2BMIData());
 			}
 			else if(chartType.equalsIgnoreCase("comorbidity")){
+				log.info(sessionId+ "/GeneralChart_Selection/Get/ComorbidityPieChart");
 				out.println(getI2B2ComorbidityData());
 			}
 			else if(chartType.equalsIgnoreCase("age_diagnosis")){
+				log.info(sessionId+ "/GeneralChart_Selection/Get/AgePieChart");
 				out.println(getI2B2AgeDiagnosisData());
 			}
 			else if(chartType.equalsIgnoreCase("cvr")){
+				log.info(sessionId+ "/GeneralChart_Selection/Get/CVRPieChart");
 				out.println(getI2B2CardiovascularRiskData());
 			}else if (chartType.equalsIgnoreCase("time_to_complication")){
+				log.info(sessionId+ "/CenterProfiling/Get/BarChart");
 				out.println(getI2B2TimeToComplication());
 			}else if (chartType.equalsIgnoreCase("bmi_pie")){
+				log.info(sessionId+ "/GeneralChart_Selection/Get/BMIPieChart");
 				out.println(getI2B2BMIPIEData());
 			}
+		}else if(step.equalsIgnoreCase("configure_session")){
+			//out.println(req.getSession().getId());
+			  UUID idOne = UUID.randomUUID();
+			  log.info(idOne+ "/Session/Create/SessionId");
+			  out.println(idOne);
 		}
 		else if(step.equalsIgnoreCase("2")){
 			try {
@@ -99,114 +115,153 @@ public class I2B2Servlet extends HttpServlet{
 				String data_category = req.getParameter("data_category");
 
 				if(chartType.equalsIgnoreCase("gender_process")){
+					String sessionId = req.getParameter("session_id");
+					String[] sessionIdToken = sessionId.split("_");
 					if(data_category.equalsIgnoreCase("LOC")){
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Gender/"+sessionIdToken[1]);
 						String data = getI2B2dataByGender_LOC(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Gender/"+sessionIdToken[1]+"/Get_LOC");
 					}
 					else if(data_category.equalsIgnoreCase("CVR")){
 						String data = getI2B2dataByGender_CVR(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Gender/"+sessionIdToken[1]+"/Get_CVR");
 					}
 					else if(data_category.equalsIgnoreCase("DRUG")){
 						String data = getI2B2dataByGender_DRUG(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Gender/"+sessionIdToken[1]+"/Get_DRUG");
 					}
 					else if(data_category.equalsIgnoreCase("COMPLICATION")){
 						String data = getI2B2dataByGender_COMPLICATION(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Gender/"+sessionIdToken[1]+"/Get_COMPLICATION");
 					}
 					else if(data_category.equalsIgnoreCase("HOSPITALIZATION")){
 						String data = getI2B2dataByGender_HOSPITALIZATION(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Gender/"+sessionIdToken[1]+"/Get_HOSPITALIZATION");
 					}
 				}
 				else if(chartType.equalsIgnoreCase("age_process")){
+					String sessionId = req.getParameter("session_id");
+					String[] sessionIdToken = sessionId.split("_");
 					if(data_category.equalsIgnoreCase("LOC")){
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_"+sessionIdToken[1]);
 						String data = getI2B2dataByAge_LOC(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_"+sessionIdToken[1]+"/Get_LOC");
 					}
 					else if(data_category.equalsIgnoreCase("CVR")){
 						String data = getI2B2dataByAge_CVR(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_"+sessionIdToken[1]+"/Get_CVR");
 					}
 					else if(data_category.equalsIgnoreCase("DRUG")){
 						String data = getI2B2dataByAge_DRUG(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_"+sessionIdToken[1]+"/Get_DRUG");
 					}
 					else if(data_category.equalsIgnoreCase("COMPLICATION")){
 						String data = getI2B2dataByAge_COMPLICATION(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_"+sessionIdToken[1]+"/Get_COMPLICATION");
 					}
 					else if(data_category.equalsIgnoreCase("HOSPITALIZATION")){
 						String data = getI2B2dataByAge_HOSPITALIZATION(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_"+sessionIdToken[1]+"/Get_HOSPITALIZATION");
 					}
 
 				}
 				else if(chartType.equalsIgnoreCase("cvr_process")){
+					String sessionId = req.getParameter("session_id");
+					String[] sessionIdToken = sessionId.split("_");
 					if(data_category.equalsIgnoreCase("LOC")){
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_CVR/"+sessionIdToken[1]);
 						String data = getI2B2dataByCVR_LOC(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_CVR/"+sessionIdToken[1]+"/Get_LOC");
 					}
 					else if(data_category.equalsIgnoreCase("CVR")){
 						String data = getI2B2dataByCVR_CVR(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_CVR/"+sessionIdToken[1]+"/Get_CVR");
 					}
 					else if(data_category.equalsIgnoreCase("DRUG")){
 						String data = getI2B2dataByCVR_DRUG(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_CVR/"+sessionIdToken[1]+"/Get_DRUG");
 					}
 					else if(data_category.equalsIgnoreCase("COMPLICATION")){
 						String data = getI2B2dataByCVR_COMPLICATION(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_CVR/"+sessionIdToken[1]+"/Get_COMPLICATION");
 					}
 					else if(data_category.equalsIgnoreCase("HOSPITALIZATION")){
 						String data = getI2B2dataByCVR_HOSPITALIZATION(Integer.parseInt(selectedValue));
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_CVR/"+sessionIdToken[1]+"/Get_HOSPITALIZATION");
 					}
 				}
 				else if(chartType.equalsIgnoreCase("comorb_process")){
+					String sessionId = req.getParameter("session_id");
+					String[] sessionIdToken = sessionId.split("_");
 					if(data_category.equalsIgnoreCase("LOC")){
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Complications/"+sessionIdToken[1]);
 						String data = getI2B2dataByComorb_LOC(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Complications/"+sessionIdToken[1]+"/Get_LOC");
 					}
 					else if(data_category.equalsIgnoreCase("CVR")){
 						String data = getI2B2dataByComorb_CVR(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Complications/"+sessionIdToken[1]+"/Get_CVR");
 					}
 					else if(data_category.equalsIgnoreCase("DRUG")){
 						String data = getI2B2dataByComorb_DRUG(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Complications/"+sessionIdToken[1]+"/Get_DRUG");
 					}
 					else if(data_category.equalsIgnoreCase("COMPLICATION")){
 						String data = getI2B2dataByComorb_COMPLICATION(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Complications/"+sessionIdToken[1]+"/Get_COMPLICATION");
 					}
 					else if(data_category.equalsIgnoreCase("HOSPITALIZATION")){
 						String data = getI2B2dataByComorb_HOSPITALIZATION(selectedValue);
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionIdToken[0]+ "/GeneralChart_Selection/FilterAction_Complications/"+sessionIdToken[1]+"/Get_HOSPITALIZATION");
 					}
 				}
 				else if(chartType.equalsIgnoreCase("all_patient_process")){
+					String sessionId = req.getParameter("session_id");	
 					if(data_category.equalsIgnoreCase("LOC")){
+						log.info(sessionId.concat("/GeneralChart_Selection/Filter/AllPatients"));
 						String data = getI2B2dataAllPatients_LOC();
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionId+ "/GeneralChart_Selection/SelectAllPatients/Get_LOC");
 					}
 					else if(data_category.equalsIgnoreCase("CVR")){
 						String data = getI2B2dataAllPatients_CVR();
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionId+ "/GeneralChart_Selection/SelectAllPatients/Get_CVR");
 					}
 					else if(data_category.equalsIgnoreCase("DRUG")){
 						String data = getI2B2dataAllPatients_DRUG();
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionId+ "/GeneralChart_Selection/SelectAllPatients/Get_DRUG");
 					}
 					else if(data_category.equalsIgnoreCase("COMPLICATION")){
 						String data = getI2B2dataAllPatients_COMPLICATION();
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionId+ "/GeneralChart_Selection/SelectAllPatients/Get_COMPLICATION");
 					}
 					else if(data_category.equalsIgnoreCase("HOSPITALIZATION")){
 						String data = getI2B2dataAllPatients_HOSPITALIZATION();
 						out.println(callProcessWS(data_category,data));
+						log.info(sessionId+ "/GeneralChart_Selection/SelectAllPatients/Get_HOSPITALIZATION");
 					}
 				}
 			} catch (ParseException e) {
@@ -214,7 +269,9 @@ public class I2B2Servlet extends HttpServlet{
 			}
 		}else if(step.equalsIgnoreCase("3")){
 			String patientNums = req.getParameter("patient_nums");
-			if(chartType.equalsIgnoreCase("comorb")){
+			String[] chartTypeToken = chartType.split(";");
+			if(chartTypeToken[0].equalsIgnoreCase("comorb")){
+				log.info(chartTypeToken[1]+ "/GeneralChart_TemporalPatterns/"+chartTypeToken[2]);
 				String durationNums = req.getParameter("duration_nums");
 				String num_classes = req.getParameter("num_classes");
 				String max_duration = req.getParameter("max_duration");
@@ -223,6 +280,7 @@ public class I2B2Servlet extends HttpServlet{
 			}
 		}else if(step.equalsIgnoreCase("0")){
 			String patientId = req.getParameter("patient_id");
+			String sessionId = req.getParameter("session_id");
 			if(chartType.equalsIgnoreCase("hba1c")){
 				out.println(getI2B2DataForHba1c(patientId));
 			}else if (chartType.equalsIgnoreCase("therapy")){
@@ -240,6 +298,7 @@ public class I2B2Servlet extends HttpServlet{
 			}else if (chartType.equalsIgnoreCase("adherence3Filtered")){
 				String atcFilter = req.getParameter("atc_filter");
 				out.println(getI2B2DataForTherapyAdherence3Filtered(patientId, atcFilter));
+				sessionId = sessionId.concat("/").concat(atcFilter);
 			}else if (chartType.equalsIgnoreCase("loc")){
 				out.println(getI2B2DataForLOC(patientId));
 			}else if (chartType.equalsIgnoreCase("cvr")){
@@ -261,6 +320,9 @@ public class I2B2Servlet extends HttpServlet{
 			}else if(chartType.equalsIgnoreCase("mvrNe")){
 				out.println(getI2B2DataForMvrNephropaty(patientId));
 			}
+			log.info(sessionId);
+		}else if(step.equalsIgnoreCase("log")){
+			log.info(chartType);
 		}
 	}
 
@@ -8409,6 +8471,43 @@ public class I2B2Servlet extends HttpServlet{
 			input = getServletContext().getResourceAsStream(path);
 
 			prop.load(input);
+			JSONObject objResult = new JSONObject();
+			JSONArray myResultsArray = new JSONArray();
+			SimpleDateFormat simpleDF = new SimpleDateFormat("dd/MM/yyyy");
+			
+			//Cerco la data di nascita
+			Date birthDate = new Date();
+			String sqlDOB = "select birth_date from patient_dimension "+
+					"where patient_num= " +patientId;
+			conn = DBUtil.getI2B2Connection();
+			pstmt = conn.prepareStatement(sqlDOB);
+			rs = pstmt.executeQuery();
+			while(rs.next()){	
+				birthDate = rs.getDate("birth_date");
+			}
+			pstmt.close();
+			rs.close();
+			conn.close();
+			
+			//cerco l'ultima visita
+			Date lastVisitDate = new Date();
+			String sql3 = "select PATIENT_NUM, max(start_date) as my_date " +
+					"from VISIT_DIMENSION " +
+					"where patient_num= " +patientId+" and sourcesystem_cd like ? group by patient_num";
+
+			conn = DBUtil.getI2B2Connection();
+			pstmt = conn.prepareStatement(sql3);
+			pstmt.setString(1, prop.getProperty("visit_sourcesystem_cd"));
+			rs = pstmt.executeQuery();
+			while(rs.next()){	
+				String myDate = simpleDF.format( rs.getDate("my_date"));
+				lastVisitDate = rs.getDate("my_date");
+				objResult.put("last_visit", myDate);
+			}
+
+			pstmt.close();
+			rs.close();
+			conn.close();
 
 			String sql = "select * from (select * from (select q1.PATIENT_NUM, q1.concept_cd, q1.start_date,  cast(q1.observation_blob as varchar2(2000)) as my_value, 'LOC' as my_id  " +
 					"from "+observationTable+" q1 " +
@@ -8486,9 +8585,6 @@ public class I2B2Servlet extends HttpServlet{
 			pstmt.setString(12, prop.getProperty("micro_vascular_risk_nephropaty"));
 
 			rs = pstmt.executeQuery();
-			JSONObject objResult = new JSONObject();
-			JSONArray myResultsArray = new JSONArray();
-			SimpleDateFormat simpleDF = new SimpleDateFormat("dd/MM/yyyy");
 			while(rs.next()){
 				String myDate = simpleDF.format( rs.getDate("start_date"));
 				if(rs.getString("my_id").equals("BMI")){
@@ -8544,6 +8640,39 @@ public class I2B2Servlet extends HttpServlet{
 					objLOC.put("obs_date",myDate);
 					objLOC.put("obs_value",  rs.getString("my_value"));
 					objLOC.put("category",category);
+					myResultsArray.add(objLOC);
+				}else if(rs.getString("my_id").equals("Hba1c")){
+					float hba1cValue = Float.parseFloat(rs.getString("my_value").replaceAll(",", "."));
+					int category =0;
+					long lastVisitMillis = lastVisitDate.getTime();
+					long birthDateMillis = birthDate.getTime();
+					long differenceMillis = lastVisitMillis-birthDateMillis;
+					double anniTraDueDate = differenceMillis / (86400000.0*365.0);
+					//System.out.println("Patient Dates: birtDate "+birthDate+" lastVisit "+lastVisitDate+" diff: "+anniTraDueDate);
+					if(anniTraDueDate<70.00){
+						//System.out.println("Patient minore 70");
+						if(hba1cValue<=53){
+							category=0;
+						}else if(hba1cValue>53 && hba1cValue<=64){
+							category=1;
+						}else if(hba1cValue>64){
+							category=2;
+						}
+					}else{
+						//System.out.println("Patient maggiore 70");
+						if(hba1cValue<=64){
+							category=0;
+						}else if(hba1cValue>64 && hba1cValue<=75){
+							category=1;
+						}else if(hba1cValue>75){
+							category=2;
+						}
+					}
+					JSONObject objLOC = new JSONObject();
+					objLOC.put("id", rs.getString("my_id"));
+					objLOC.put("obs_date", myDate);
+					objLOC.put("obs_value", rs.getString("my_value"));
+					objLOC.put("category", category);
 					myResultsArray.add(objLOC);
 					//TODO
 				}else if(rs.getString("my_id").equals("MICROVASCULAR_RISK_RETINOPATY")){
@@ -8621,22 +8750,6 @@ public class I2B2Servlet extends HttpServlet{
 			rs = pstmt.executeQuery();
 			while(rs.next()){	
 				objResult.put("onset_year", rs.getInt("nval_num"));
-			}
-
-			pstmt.close();
-			rs.close();
-			conn.close();
-
-			String sql3 = "select PATIENT_NUM, max(start_date) as my_date " +
-					"from VISIT_DIMENSION " +
-					"where patient_num= " +patientId+" group by patient_num";
-
-			conn = DBUtil.getI2B2Connection();
-			pstmt = conn.prepareStatement(sql3);
-			rs = pstmt.executeQuery();
-			while(rs.next()){	
-				String myDate = simpleDF.format( rs.getDate("my_date"));
-				objResult.put("last_visit", myDate);
 			}
 
 			pstmt.close();

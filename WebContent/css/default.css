@@ -979,6 +979,7 @@ div.chart_step_two {
     padding: 5px 10px;
     font-family: MyriadPro;
     cursor:pointer;
+    margin-right: 5px;
 }
 
 .chart_title_help{

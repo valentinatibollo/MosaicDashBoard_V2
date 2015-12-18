@@ -38,6 +38,8 @@ var drill_down_comorb_details_data_storage;
 var drill_down_comorb_rawdata_storage;
 var drill_down_comorb_details_rawdata_storage;
 var comorbitySelected;
+var sessionId;
+var bugout;
 
 
 var processDataCategories = ["LOC","DRUG","HOSPITALIZATION", "CVR", "COMPLICATION"];
@@ -89,13 +91,16 @@ google.load("visualization", "1", {packages:["corechart", "timeline"]});
 google.setOnLoadCallback(drawCharts);
 
 function drawCharts() {
+	bugout = new debugout();
 	$(".more").each(function(){
 		$(this).addClass("showmore")
 	})
 	$(".more").click(function(){
 		if($(this).hasClass("showless")){
+			bugout.log(new Date().toUTCString()+"/"+sessionId+"/Menu_Info/Show/Less");
 			$(this).removeClass("showless").addClass("showmore")}
 		else{
+			bugout.log(new Date().toUTCString()+"/"+sessionId+"/Menu_Info/Show/More");
 			$(this).addClass("showless").removeClass("showmore")
 		}
 		$("div",this).slideToggle()
@@ -104,12 +109,28 @@ function drawCharts() {
 	$("#progressbar li").eq(0).addClass("active");
 	$('#step_item_0').show();
 	$('#comorb_chart_ex_container').hide();
+//GET SESSION ID
+//	sessionId = $.ajax({
+//		url: "./i2b2Servlet/",
+//		dataType:"text",
+//		async: false,
+//		data: {step: "configure_session"}
+//	}).responseText;
+	$.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: false,
+		data: {step: "configure_session"},
+		complete: function(results){
+			sessionId = results.responseText.trim()
+		}
+	});
 //	GENDER
 	gender_chart_data_json = $.ajax({
 		url: "./i2b2Servlet/",
 		dataType:"json",
 		async: false,
-		data: {step: "1",chart_type: "gender"}
+		data: {step: "1",chart_type: "gender", session_id: sessionId}
 	}).responseText;
 
 	var gender_chart_data = new google.visualization.DataTable(gender_chart_data_json);
@@ -131,7 +152,7 @@ function drawCharts() {
 		url: "./i2b2Servlet/",
 		dataType:"json",
 		async: false,
-		data: {step: "1",chart_type: "bmi"}
+		data: {step: "1",chart_type: "bmi", session_id: sessionId}
 	}).responseText;
 
 	var bmi_chart_data = new google.visualization.DataTable(bmi_chart_data_json);
@@ -159,7 +180,7 @@ function drawCharts() {
 		url: "./i2b2Servlet/",
 		dataType:"json",
 		async: false,
-		data: {step: "1",chart_type: "comorbidity"}
+		data: {step: "1",chart_type: "comorbidity", session_id: sessionId}
 	}).responseText;
 
 	var outerJson = jQuery.parseJSON(comorb_chart_data_json);
@@ -189,7 +210,7 @@ function drawCharts() {
 		url: "./i2b2Servlet/",
 		dataType:"json",
 		async: false,
-		data: {step: "1", chart_type: "age_diagnosis"}
+		data: {step: "1", chart_type: "age_diagnosis", session_id: sessionId}
 	}).responseText;
 
 	agediagnosis_chart_data_json = jQuery.parseJSON(agediagnosis_chart_data_json);
@@ -214,7 +235,7 @@ function drawCharts() {
 		url: "./i2b2Servlet/",
 		dataType:"json",
 		async: false,
-		data: {step: "1", chart_type: "bmi_pie"}
+		data: {step: "1", chart_type: "bmi_pie", session_id: sessionId}
 	}).responseText;
 
 	bmipie_chart_data_json = jQuery.parseJSON(bmipie_chart_data_json);
@@ -240,7 +261,7 @@ function drawCharts() {
 		url: "./i2b2Servlet/",
 		dataType:"json",
 		async: false,
-		data: {step: "1",chart_type: "cvr"}
+		data: {step: "1",chart_type: "cvr", session_id: sessionId}
 	}).responseText;
 
 	var cvr_chart_data = new google.visualization.DataTable(cvr_chart_data_json);
@@ -290,7 +311,8 @@ function drawCharts() {
 				data: { step: "2",
 					chart_type: "gender_process",
 					data_category: processDataCategories[i],
-					selected_value:  selected[0].row  
+					selected_value:  selected[0].row,
+					session_id: sessionId.concat("_").concat(selectedStr),
 				},
 				complete: function(results){
 					gender_chart.setSelection(null);
@@ -335,7 +357,8 @@ function drawCharts() {
 				data: { step: "2",
 					chart_type: "age_process",
 					data_category: processDataCategories[i],
-					selected_value:  agediagnosis_chart_data_json.raw_values[selected[0].row].patient_nums  
+					selected_value:  agediagnosis_chart_data_json.raw_values[selected[0].row].patient_nums,
+					session_id: sessionId.concat("_").concat("AgeDiagnosis/").concat(selectedStr),
 				},
 				complete: function(results){
 					agediagnosis_chart.setSelection(null);
@@ -388,7 +411,8 @@ function drawCharts() {
 				data: { step: "2",
 					chart_type: "age_process", //lancio ageprocess perchè passo la lista dei patientNum (stessa logica, quindi riciclo il metodo)
 					data_category: processDataCategories[i],
-					selected_value:  bmipie_chart_data_json.raw_values[selected[0].row].patient_nums  
+					selected_value:  bmipie_chart_data_json.raw_values[selected[0].row].patient_nums,
+					session_id: sessionId.concat("_").concat("BMI/").concat(selectedStr),
 				},
 				complete: function(results){
 					bmipie_chart.setSelection(null);
@@ -437,7 +461,8 @@ function drawCharts() {
 				data: { step: "2",
 					chart_type: "cvr_process",
 					data_category: processDataCategories[i],
-					selected_value:  selected[0].row  
+					selected_value:  selected[0].row,
+					session_id: sessionId.concat("_").concat(selectedStr),
 				},
 				complete: function(results){
 					cvr_chart.setSelection(null);
@@ -550,7 +575,8 @@ function drawCharts() {
 					data: { step: "2",
 						chart_type: "comorb_process",
 						data_category: processDataCategories[i],
-						selected_value:  complClassJsonRawValues[comorbIndexSlice].patient_nums  
+						selected_value:  complClassJsonRawValues[comorbIndexSlice].patient_nums,
+						session_id: sessionId.concat("_").concat(selectedString),
 					},
 					complete: function(results){
 						comorb_chart2.setSelection(null);
@@ -582,7 +608,8 @@ function drawCharts() {
 				data: { step: "2",
 					chart_type: "comorb_process",
 					data_category: processDataCategories[i],
-					selected_value:  complClassJsonRawValuesMacro[macroIndexSlice].patient_nums  
+					selected_value:  complClassJsonRawValuesMacro[macroIndexSlice].patient_nums,
+					session_id: sessionId.concat("_").concat(selectedStringMacro),
 				},
 				complete: function(results){
 					comorb_chart_macro.setSelection(null);
@@ -612,7 +639,8 @@ function drawCharts() {
 				data: { step: "2",
 					chart_type: "comorb_process",
 					data_category: processDataCategories[i],
-					selected_value:  complClassJsonRawValuesMicro[microIndexSlice].patient_nums  
+					selected_value:  complClassJsonRawValuesMicro[microIndexSlice].patient_nums,
+					session_id: sessionId.concat("_").concat(selectedStringMicro),
 				},
 				complete: function(results){
 					comorb_chart_micro.setSelection(null);
@@ -644,7 +672,8 @@ function drawCharts() {
 				data: { step: "2",
 					chart_type: "comorb_process",
 					data_category: processDataCategories[i],
-					selected_value:  complClassJsonRawValuesNonVascular[nvIndexSlice].patient_nums 
+					selected_value:  complClassJsonRawValuesNonVascular[nvIndexSlice].patient_nums,
+					session_id: sessionId.concat("_").concat(selectedStringNV),
 				},
 				complete: function(results){
 					comorb_chart_nv.setSelection(null);
@@ -671,6 +700,7 @@ function drillDownAllPatients(){
 			data: { step: "2",
 				chart_type: "all_patient_process",
 				data_category: processDataCategories[i],
+				session_id: sessionId,
 				selected_value:  0 //non si usa  
 			},
 			complete: function(results){
@@ -856,7 +886,7 @@ function drawProcessChart(data){
 			dataType:"json",
 			async: true,
 			data: { step: "3",
-				chart_type: "comorb",
+				chart_type: "comorb;".concat(sessionId).concat(";Story_LOC_").concat(history.replace("story","")).concat("/Step:").concat(step),
 				patient_nums: p_num_param, 
 				duration_nums: duration_param,
 				num_classes : numClassesValue,
@@ -897,7 +927,7 @@ function drawProcessChart(data){
 			dataType:"json",
 			async: true,
 			data: { step: "3",
-				chart_type: "comorb",
+				chart_type: "comorb;".concat(sessionId).concat(";Story_CVR_").concat(history.replace("story","")).concat("/Step:").concat(step),
 				patient_nums: p_num_param, 
 				duration_nums: duration_param,
 				num_classes : numClassesValue,
@@ -936,7 +966,7 @@ function drawProcessChart(data){
 				dataType:"json",
 				async: true,
 				data: { step: "3",
-					chart_type: "comorb",
+					chart_type: "comorb;".concat(sessionId).concat(";Story_HOSPITALIZATION_").concat(history.replace("story","")).concat("/Step:").concat(step),
 					patient_nums: p_num_param, 
 					duration_nums: duration_param,
 					num_classes : numClassesValue,
@@ -976,7 +1006,7 @@ function drawProcessChart(data){
 				dataType:"json",
 				async: true,
 				data: { step: "3",
-					chart_type: "comorb",
+					chart_type: "comorb;".concat(sessionId).concat(";Story_DRUG_").concat(history.replace("story","")).concat("/Step:").concat(step),
 					patient_nums: p_num_param, 
 					duration_nums: duration_param,
 					num_classes : numClassesValue,
@@ -1016,7 +1046,7 @@ function drawProcessChart(data){
 				dataType:"json",
 				async: true,
 				data: { step: "3",
-					chart_type: "comorb",
+					chart_type: "comorb;".concat(sessionId).concat(";Story_COMPLICATION_").concat(history.replace("story","")).concat("/Step:").concat(step),
 					patient_nums: p_num_param, 
 					duration_nums: duration_param,
 					num_classes : numClassesValue,
@@ -1770,7 +1800,7 @@ function selectHandlerComplicationPoint(){
 			dataType:"json",
 			async: true,
 			data: { step: "3",
-				chart_type: "comorb",
+				chart_type: "comorb;".concat(sessionId).concat(";Story_COMPLICATION_").concat(history.replace("story","")).concat("/Step:").concat(step),
 				patient_nums: p_num_param, 
 				duration_nums: duration_param,
 				num_classes : numClassesValue,
@@ -1851,6 +1881,7 @@ function drawDrillDown(dataJSON){
 		var selectedPatientNums = drill_down_comorb_rawdata_storage[selected[0].row].patient_nums;
 		comorbitySelected = drill_down_comorb_data_storage.getValue(selected[0].row,0);
 		getPatientsFromDrillDown(selectedPatientNums);
+		logToServer(sessionId+"/GeneralChart_DrillDown/DistributionOfComplicationI_Click/"+comorbitySelected+"/GET_PATIENTINFO");
 	}
 
 	//COMPLICATION II SELECTOR
@@ -1862,6 +1893,7 @@ function drawDrillDown(dataJSON){
 		var selectedPatientNums = drill_down_comorb_details_rawdata_storage[selected[0].row].patient_nums;
 		comorbitySelected = drill_down_comorb_details_data_storage.getValue(selected[0].row,0);
 		getPatientsFromDrillDown(selectedPatientNums);
+		logToServer(sessionId+"/GeneralChart_DrillDown/DistributionOfComplicationII_Click/"+comorbitySelected+"/GET_PATIENTINFO");
 	}
 
 
@@ -1961,6 +1993,7 @@ function drawDrillDown(dataJSON){
 
 		$( "#dialogHelp" ).dialog("open");
 	}
+	logToServer(sessionId+"/GeneralChart_DrillDown/PatientHistogram_Click/GET_PATIENTINFO");
 }
 
 //TODO: modificato per Consortium
@@ -1987,6 +2020,7 @@ function getPatientsFromDrillDown(patientList){
 }
 
 function backToProcess(){
+	logToServer(sessionId+"/GeneralChart_DrillDown/BackToTemporalPatterns_Click");
 	$("#progressbar li").eq(1).addClass("active");
 	$("#progressbar li").eq(2).removeClass("active");
 	hideFilters(2);
@@ -2076,6 +2110,7 @@ function loadGeneralChartSection(){
 	$("#progressbar li").eq(1).removeClass("active");
 	$("#progressbar li").eq(2).removeClass("active");
 	$('#step_item_0').show();
+	logToServer(sessionId+"/Menu/TabChange/GeneralCharts");
 }
 
 
@@ -2094,6 +2129,7 @@ function resetGeneralChartSection(){
 
 
 function loadCenterProfilingSection(){
+	logToServer(sessionId+"/Menu/TabChange/CenterProfiling");
 	setMenu(4);
 //	$(".menu_item_selected").removeClass("menu_item_selected");
 //	$("#menu_item_4").addClass("menu_item_selected");
@@ -2114,11 +2150,12 @@ function loadCenterProfilingSection(){
 	$("#singlePatientDataContainer").hide();
 	$("#centerProfilingContainer").show();
 	renderContainerCP();
-	drawChartsCP();
+	drawChartsCP(sessionId);
 	$('#step_item_0').show();
 }
 
 function loadPatientSection(){
+	logToServer(sessionId+"/Menu/TabChange/Patient");
 	setMenu(5);
 
 	hideFilters();
@@ -2160,6 +2197,7 @@ function selectPatientDataView(caller){
 		$('#trafficlights_container').show();
 		showTooltip(6);
 		showTooltipInfo(6);
+		logToServer(sessionId+"/Patient/TabChange/TrafficLights");
 	}
 	else if(caller.attr("id").indexOf("1")>0){
 		$('#trafficlights_container').hide();
@@ -2176,6 +2214,7 @@ function selectPatientDataView(caller){
 		$("#clinicalDataChartContainer").siblings().hide();
 		showTooltip(7);
 		showTooltipInfo(7);
+		logToServer(sessionId+"/Patient/TabChange/ClinicalData");
 	}
 	else if(caller.attr("id").indexOf("2")>0){
 		$('#trafficlights_container').hide();
@@ -2187,6 +2226,7 @@ function selectPatientDataView(caller){
 		$("#DrugChartContainer").siblings().hide();
 		showTooltip(8);
 		showTooltipInfo(8);
+		logToServer(sessionId+"/Patient/TabChange/Therapies");
 	}
 }
 
@@ -2200,14 +2240,17 @@ function selectStepTwoDataView(caller){
 		$("span",caller).removeClass("singleStepTwoMenuItemLabel").addClass("singleStepTwoMenuItemLabelSelected");
 	}
 	if(caller.attr("id").indexOf("1")>0){
+		logToServer(sessionId+"/GeneralChart_TemporalPatterns/TabChange/TP_Complication");
 		$("#div_container_COMPLICATION").show();
 		$("#div_container_COMPLICATION").siblings().hide();
 	}
 	else if(caller.attr("id").indexOf("2")>0){
+		logToServer(sessionId+"/GeneralChart_TemporalPatterns/TabChange/TP_Drug");
 		$("#div_container_DRUG").show();
 		$("#div_container_DRUG").siblings().hide();
 	}
 	else if(caller.attr("id").indexOf("3")>0){
+		logToServer(sessionId+"/GeneralChart_TemporalPatterns/TabChange/TP_Hosp_LOC_CVR");
 		$("#div_container_LOC").siblings().hide();
 		$("#div_container_LOC").show();
 		$("#div_container_HOSPITALIZATION").show();
@@ -2276,7 +2319,8 @@ function createTherapiesAdherenceChart2(){
 		async: true,
 		data: { step: "0",
 			chart_type: "adherence3",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_Therapies/Get/AdherenceData")
 		},
 		complete: function(results){
 			$('.buttonTherapyDivClass').remove();
@@ -2413,7 +2457,8 @@ function createTherapiesAdherenceChart2Filtered(atcFilter){
 		data: { step: "0",
 			chart_type: "adherence3Filtered",
 			patient_id: patientIdSelected,
-			atc_filter : atcFilter
+			atc_filter : atcFilter,
+			session_id: sessionId.concat("/Patient_Therapies/Get/AdherenceDataFiltered")
 		},
 		complete: function(results){
 			//$('.buttonTherapyDivClass').remove();
@@ -2563,7 +2608,8 @@ function createTherapiesChart(){
 		async: true,
 		data: { step: "0",
 			chart_type: "therapy",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_Therapies/Get/TherapyData")
 		},
 		complete: function(results){
 			//	alert(results.responseText)
@@ -2695,7 +2741,8 @@ function createHba1cChart(){
 		async: true,
 		data: { step: "0",
 			chart_type: "hba1c",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_ClinicalData/Get/Hba1C")
 		},
 		complete: function(results){
 			var scatterChartData = new google.visualization.DataTable(results.responseText);
@@ -2725,7 +2772,8 @@ function createWeightRawChart(){
 		async: true,
 		data: { step: "0",
 			chart_type: "weightraw",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_ClinicalData/Get/Weight_RawData")
 		},
 		complete: function(results){
 			var scatterChartData = new google.visualization.DataTable(results.responseText);
@@ -2754,7 +2802,8 @@ function createLOCChart(){
 		async: true,
 		data: { step: "0",
 			chart_type: "loc",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_ClinicalData/Get/LOC")
 		},
 		complete: function(results){
 			var obj = $.parseJSON(results.responseText);
@@ -2805,7 +2854,8 @@ function createWeightChart(){
 		async: true,
 		data: { step: "0",
 			chart_type: "weight",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_ClinicalData/Get/Weight_TemporalAbstraction")
 		},
 		complete: function(results){
 			var obj = $.parseJSON(results.responseText);
@@ -2855,7 +2905,8 @@ function createDietChart(){
 		async: true,
 		data: { step: "0",
 			chart_type: "diet",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_ClinicalData/Get/Diet_TemporalAbstraction")
 		},
 		complete: function(results){
 			var obj = $.parseJSON(results.responseText);
@@ -2904,7 +2955,8 @@ function createComplicationsChart(){
 		async: true,
 		data: { step: "0",
 			chart_type: "complication",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_ClinicalData/Get/Complication")
 		},
 
 		complete: function(results){
@@ -2973,7 +3025,8 @@ function createComplicationsChart2(){
 		async: true,
 		data: { step: "0",
 			chart_type: "complication2",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_ClinicalData/Get/Complication2")
 		},
 
 		complete: function(results){
@@ -3048,7 +3101,8 @@ function createCVRChart(){
 		async: true,
 		data: { step: "0",
 			chart_type: "cvr",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient_ClinicalData/Get/CVR")
 		},
 		complete: function(results){
 			$('.legend').remove();
@@ -3096,7 +3150,8 @@ function designTrafficLights(){
 		async: true,
 		data: { step: "0",
 			chart_type: "trafficlights",
-			patient_id: patientIdSelected
+			patient_id: patientIdSelected,
+			session_id: sessionId.concat("/Patient/Get/TrafficLightsData")
 		},
 		complete: function(results){
 			showTooltip(6);
@@ -3418,7 +3473,8 @@ function openUC3Chart(callerId){
 			async: true,
 			data: { step: "0",
 				chart_type: "hba1c",
-				patient_id: patientIdSelected
+				patient_id: patientIdSelected,
+				session_id: sessionId.concat("/Patient_TrafficLights/ViewDetails_Click/Hba1C")
 			},
 			complete: function(results){
 				var scatterChartData = new google.visualization.DataTable(results.responseText);
@@ -3453,7 +3509,8 @@ function openUC3Chart(callerId){
 			async: true,
 			data: { step: "0",
 				chart_type: "cvr",
-				patient_id: patientIdSelected
+				patient_id: patientIdSelected,
+				session_id: sessionId.concat("/Patient_TrafficLights/ViewDetails_Click/CVR")
 			},
 			complete: function(results){
 				$('.legend').remove();
@@ -3496,7 +3553,8 @@ function openUC3Chart(callerId){
 			async: true,
 			data: { step: "0",
 				chart_type: "diet",
-				patient_id: patientIdSelected
+				patient_id: patientIdSelected,
+				session_id: sessionId.concat("/Patient_TrafficLights/ViewDetails_Click/Diet")
 			},
 			complete: function(results){
 				var obj = $.parseJSON(results.responseText);
@@ -3547,7 +3605,8 @@ function openUC3Chart(callerId){
 			async: true,
 			data: { step: "0",
 				chart_type: "loc",
-				patient_id: patientIdSelected
+				patient_id: patientIdSelected,
+				session_id: sessionId.concat("/Patient_TrafficLights/ViewDetails_Click/LOC")
 			},
 			complete: function(results){
 				var obj = $.parseJSON(results.responseText);
@@ -3600,7 +3659,8 @@ function openUC3Chart(callerId){
 			async: true,
 			data: { step: "0",
 				chart_type: "mvrR",
-				patient_id: patientIdSelected
+				patient_id: patientIdSelected,
+				session_id: sessionId.concat("/Patient_TrafficLights/ViewDetails_Click/Retinopathy")
 			},
 			complete: function(results){
 				var scatterChartData = new google.visualization.DataTable(results.responseText);
@@ -3646,7 +3706,8 @@ function openUC3Chart(callerId){
 			async: true,
 			data: { step: "0",
 				chart_type: "mvrNe",
-				patient_id: patientIdSelected
+				patient_id: patientIdSelected,
+				session_id: sessionId.concat("/Patient_TrafficLights/ViewDetails_Click/Nephropathy")
 			},
 			complete: function(results){
 				var scatterChartData = new google.visualization.DataTable(results.responseText);
@@ -3682,7 +3743,8 @@ function openUC3Chart(callerId){
 			async: true,
 			data: { step: "0",
 				chart_type: "mvrNu",
-				patient_id: patientIdSelected
+				patient_id: patientIdSelected,
+				session_id: sessionId.concat("/Patient_TrafficLights/ViewDetails_Click/Neuropathy")
 			},
 			complete: function(results){
 				var scatterChartData = new google.visualization.DataTable(results.responseText);
@@ -3718,27 +3780,33 @@ function openHelp(caller){
 	var message="";
 	var helptitle="";
 	if(caller.id == "pc_complication_help"){
+		bugout.log(new Date().toUTCString()+"/"+sessionId+"/GeneralChart_TemporalPatterns/InfoAbout_Click/Complications_Info");
 		message="Complications careflows represent the sequential arising of complications during the disease progression.<br>"+
 		"Under 'Histories with more than one complication' click complications names to show careflows starting with the selected one.<br> "+
 		"Click on the complication label name within the graph to view complication distributions.";
 		helptitle="Info about Complications";
 	}else if (caller.id == "pc_drug_help"){
+		bugout.log(new Date().toUTCString()+"/"+sessionId+"/GeneralChart_TemporalPatterns/InfoAbout_Click/Drug_Info");
 		message="Drug careflows are extracted from drug purchasing data stream. Careflows represent the most common exposure to group of active principles since the T2D diagnosis.";
 		helptitle="Info about Drug";
 	}else if (caller.id == "pc_loc_help"){
+		bugout.log(new Date().toUTCString()+"/"+sessionId+"/GeneralChart_TemporalPatterns/InfoAbout_Click/LOC_Info");
 		message="LOC stays for Level of Complexity. LOC careflows represent the evolution of the disease from the diagnosis: <br>"+
-		"Stable: no complication<br> 1stLevel: arise of the first complication<br> 2ndLevel: arise of multiple complications<br> 3rdLevel: hospitalization due to previous complication";
+				"Stable: no complication<br> 1stLevel: arise of the first complication<br> 2ndLevel: arise of multiple complications<br> 3rdLevel: hospitalization due to previous complication";
 		helptitle="Info about LOC";
 	}else if (caller.id == "pc_cvr_help"){
+		bugout.log(new Date().toUTCString()+"/"+sessionId+"/GeneralChart_TemporalPatterns/InfoAbout_Click/CVR_Info");
 		message="CVR indicates the Cardiovascular risk at 10 years, calculated with the 'Progetto Cuore' risk model. "+
 		"Careflows represent sequences of risk values intervals, stratified on the basis of fixed thresholds. From Risk I: less than 5% to Risk VI more than 30%.";
 		helptitle="Info about CVR";
 	}else if (caller.id == "pc_hospitalization_help"){
+		bugout.log(new Date().toUTCString()+"/"+sessionId+"/GeneralChart_TemporalPatterns/InfoAbout_Click/Hospitalization_Info");
 		message="Careflows represent the most common sequences of Day Hospital and Hospitalization.";
 		helptitle="Info about Hospitalization";
 	}else if (caller.id == "therapy_adherence_help"){
+		bugout.log(new Date().toUTCString()+"/"+sessionId+"/Patient_Therapies/InfoAbout_Click/TherapyAdherence_Info");
 		message="By default, the graph shows all the therapy categories.<br>It is possible to filter by category selecting/deselecting the check box near therapy category description and clicking on 'Apply Filter'.<br>" +
-		"It is also possible to filter by specific drug. To do that, click on a category name to visualize subcategories. The selection is done by clicking/unclicking subcategories name and clicking on 'Apply Filter'.";
+				"It is also possible to filter by specific drug. To do that, click on a category name to visualize subcategories. The selection is done by clicking/unclicking subcategories name and clicking on 'Apply Filter'.";
 		helptitle="Info about Therapy Purchasing Behaviour";
 	}
 	$('#dialogHelp_chart').html(message);
@@ -3787,4 +3855,18 @@ function selectTablePatient(form){
 	patientCompleteNameSelected = ""+patientIdSelected;
 	designTrafficLights();
 	$("#tablePatientdialog").dialog('close');
+}
+
+function logToServer(message){
+	$.ajax({
+		url: "./i2b2Servlet/",
+		async: false,
+		data: { step: "log",
+			chart_type: message
+		},
+		success: function(result) {
+		},
+		error: function() { 
+		}
+	});
 }
