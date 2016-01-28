@@ -320,7 +320,7 @@ public class I2B2Servlet extends HttpServlet{
 			}else if(chartType.equalsIgnoreCase("mvrNe")){
 				out.println(getI2B2DataForMvrNephropaty(patientId));
 			}
-			log.info(sessionId);
+			log.info(sessionId.concat("/").concat(patientId));
 		}else if(step.equalsIgnoreCase("log")){
 			log.info(chartType);
 		}

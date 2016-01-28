@@ -3851,8 +3851,10 @@ function selectTablePatient(form){
 	$("#singlePatientDataChartContainer").load("trafficlights.html"); 
 	$("#singlePatientDataChartContainer").show();
 	patientIdSelected = $("#patientTxt").val();
+	
 	//MODIFY HERE IF YOU WANT PATIENTNAME
 	patientCompleteNameSelected = ""+patientIdSelected;
+	logToServer(sessionId+"/Patient/Search/GET_PATIENTINFO"+patientCompleteNameSelected);
 	designTrafficLights();
 	$("#tablePatientdialog").dialog('close');
 }
