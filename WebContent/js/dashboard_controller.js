@@ -40,6 +40,7 @@ var drill_down_comorb_details_rawdata_storage;
 var comorbitySelected;
 var sessionId;
 var bugout;
+var totPzSelected;
 
 
 var processDataCategories = ["LOC","DRUG","HOSPITALIZATION", "CVR", "COMPLICATION"];
@@ -148,31 +149,30 @@ function drawCharts() {
 
 //	BMI        
 
-	bmi_chart_data_json = $.ajax({
-		url: "./i2b2Servlet/",
-		dataType:"json",
-		async: false,
-		data: {step: "1",chart_type: "bmi", session_id: sessionId}
-	}).responseText;
-
-	var bmi_chart_data = new google.visualization.DataTable(bmi_chart_data_json);
-
-
-	var bmi_options = {
-			chartArea:{top:20,width:"80%",height:"80%"},
-			hAxis: {slantedTextAngle: 90},
-			//isStacked: true,
-			tooltip: { textStyle: { fontName: 'MyriadPro', fontSize: 14 } },
-			legend: {position: 'top', alignment: 'center', textStyle: { fontName: 'MyriadPro', fontSize: 14 } },
-			explorer: { actions: ['dragToZoom', 'rightClickToReset'],  maxZoomIn: .01 },
-			series: [{color: '#015E84', visibleInLegend: true}, 
-			         {color: '#AF5E5E', visibleInLegend: true}],
-			         curveType: 'function'
-	};
-
-	var bmi_chart = new google.visualization.ColumnChart(document.getElementById('bmi_chart'));
-//	var bmi_chart = new google.visualization.LineChart(document.getElementById('bmi_chart'));
-	bmi_chart.draw(bmi_chart_data, bmi_options);
+//	bmi_chart_data_json = $.ajax({
+//		url: "./i2b2Servlet/",
+//		dataType:"json",
+//		async: false,
+//		data: {step: "1",chart_type: "bmi", session_id: sessionId}
+//	}).responseText;
+//
+//	var bmi_chart_data = new google.visualization.DataTable(bmi_chart_data_json);
+//
+//
+//	var bmi_options = {
+//			chartArea:{top:20,width:"80%",height:"80%"},
+//			hAxis: {slantedTextAngle: 90},
+//			//isStacked: true,
+//			tooltip: { textStyle: { fontName: 'MyriadPro', fontSize: 14 } },
+//			legend: {position: 'top', alignment: 'center', textStyle: { fontName: 'MyriadPro', fontSize: 14 } },
+//			explorer: { actions: ['dragToZoom', 'rightClickToReset'],  maxZoomIn: .01 },
+//			series: [{color: '#015E84', visibleInLegend: true}, 
+//			         {color: '#AF5E5E', visibleInLegend: true}],
+//			         curveType: 'function'
+//	};
+//	var bmi_chart = new google.visualization.ColumnChart(document.getElementById('bmi_chart'));
+////	var bmi_chart = new google.visualization.LineChart(document.getElementById('bmi_chart'));
+//	bmi_chart.draw(bmi_chart_data, bmi_options);
 
 
 //	COMORBIDITY
@@ -255,6 +255,29 @@ function drawCharts() {
 	var bmipie_chart = new google.visualization.PieChart(document.getElementById('bmipie_chart'));
 	bmipie_chart.draw(bmipie_chart_data, bmipie_options);
 
+//	HBA1CPIE
+	hba1c_chart_data_json = $.ajax({
+		url: "./i2b2Servlet/",
+		dataType:"json",
+		async: false,
+		data: {step: "1", chart_type: "hba1c", session_id: sessionId}
+	}).responseText;
+
+	hba1c_chart_data_json = jQuery.parseJSON(hba1c_chart_data_json);
+
+	var hba1c_chart_data = new google.visualization.DataTable(hba1c_chart_data_json.chart_json);
+
+	var hba1c_options = {
+			chartArea:{top:20,width:"80%",height:"80%"},
+			legend: {position: 'right', alignment: 'center',textStyle: { fontName: 'MyriadPro', fontSize: 14 } },
+			tooltip: { textStyle: { fontName: 'MyriadPro', fontSize: 14 } },
+			slices: {0: {color: '#01827C'}, 1:{color: '#D18369'},  2:{color: '#927D62'},3:{color: '#015E84'},4:{color: '#90C8D1'}},
+				pieSliceText: 'value'
+	};
+	
+
+	var hba1cpie_chart = new google.visualization.PieChart(document.getElementById('hba1cpie_chart'));
+	hba1cpie_chart.draw(hba1c_chart_data, hba1c_options);
 
 	//CARDIOVASCULAR RISK
 	cvr_chart_data_json = $.ajax({
@@ -286,7 +309,7 @@ function drawCharts() {
 	function selectGenderHandler(e) {
 		//alert('A table row was selected');
 		var selected = gender_chart.getSelection();
-
+		totPzSelected = gender_chart_data.getValue(selected[0].row, 1);
 		var selectedStr = "";
 		if(parseInt(selected[0].row)==0){
 			selectedStr = "M";
@@ -328,7 +351,7 @@ function drawCharts() {
 	function selectAgeHandler(e) {
 		//alert('A table row was selected');
 		var selected = agediagnosis_chart.getSelection();
-
+		totPzSelected = agediagnosis_chart_data.getValue(selected[0].row, 1);
 		var selectedStr = "";
 		if(parseInt(selected[0].row)==0){
 			selectedStr = "0-10";
@@ -374,7 +397,8 @@ function drawCharts() {
 	function selectBMIPieHandler(e) {
 		//alert('A table row was selected');
 		var selected = bmipie_chart.getSelection();
-
+		totPzSelected = bmipie_chart_data.getValue(selected[0].row, 1);
+		
 		var selectedStr = "";
 		if(parseInt(selected[0].row)==0){
 			selectedStr = "Very Severely Underweight";
@@ -421,12 +445,63 @@ function drawCharts() {
 			});
 		}
 	}
+	
+	//HBA1C SELECTOR
+	google.visualization.events.addListener(hba1cpie_chart, 'select', selectHba1cHandler);
+
+	function selectHba1cHandler(e) {
+		//alert('A table row was selected');
+		var selected = hba1cpie_chart.getSelection();
+		//alert('A table row was selected '+hba1c_chart_data.getValue(selected[0].row, 1));
+		totPzSelected = hba1c_chart_data.getValue(selected[0].row, 1);
+
+		var selectedStr = "";
+		if(parseInt(selected[0].row)==0){
+			selectedStr = "< 53 mmol/mol";
+		}else if(parseInt(selected[0].row)==1){
+			selectedStr = "[53-64] mmol/mol";
+		}else if(parseInt(selected[0].row)==2){
+			selectedStr = "[64-75] mmol/mol";
+		}else if(parseInt(selected[0].row)==3){
+			selectedStr = "[75-86] mmol/mol";
+		}else if(parseInt(selected[0].row)==4){
+			selectedStr = ">= 86 mmol/mol";
+		}
+
+		hideGraphs(1);
+		showLoader();
+
+		$(".step_two_two").html("");
+		//	$(".step_two_two").append('<div id="prova_post"></div>');
+		$('#step_item_0').hide();
+		$('#step_item_1 > span').text("Hba1c: " + selectedStr);
+		$('#step_item_1').show();
+		resetGeneralChartSection();
+		for(var i=0; i<processDataCategories.length; i++){
+			$.ajax({
+				url: "./i2b2Servlet/",
+				dataType:"json",
+				async: true,
+				data: { step: "2",
+					chart_type: "age_process", //lancio ageprocess perchè passo la lista dei patientNum (stessa logica, quindi riciclo il metodo)
+					data_category: processDataCategories[i],
+					selected_value:  hba1c_chart_data_json.raw_values[selected[0].row].patient_nums,
+					session_id: sessionId.concat("_").concat("HBA1C/").concat(selectedStr),
+				},
+				complete: function(results){
+					hba1cpie_chart.setSelection(null);
+					getProcess(results.responseText);
+				}
+			});
+		}
+	}
 
 	//CVR SELECTOR
 	google.visualization.events.addListener(cvr_chart, 'select', selectVRHandler);
 	function selectVRHandler(e) {	
 		var selected = cvr_chart.getSelection();
 		//alert('A table row was selected '+selected[0].row);
+		totPzSelected = cvr_chart_data.getValue(selected[0].row, 1);
 		var selectedStr = "";
 		if(parseInt(selected[0].row)==0){
 			selectedStr = "I";
@@ -556,7 +631,7 @@ function drawCharts() {
 		}else{
 			var selectedComorb = comorb_chart2.getSelection();
 			var comorbIndexSlice = selectedComorb[0].row;
-
+			totPzSelected = comorb_chart_data.getValue(selected[0].row, 1);
 			//alert('A table row was selected from Comorb '+comorbIndexSlice+ " "+complClassJsonRawValues[comorbIndexSlice].patient_nums);
 			hideGraphs(1);
 			showLoader();
@@ -589,6 +664,7 @@ function drawCharts() {
 
 	function selectComorbHandlerMacro(e) {
 		var selectedMacro = comorb_chart_macro.getSelection();
+		totPzSelected = comorbidityDataDetail.getValue(selectedMacro[0].row, 1);
 		var macroIndexSlice = selectedMacro[0].row;
 		var selectedStringMacro = comorbidityDataDetail.getValue(selectedMacro[0].row,0);
 		//alert('A table row was selected from Macro '+macroIndexSlice+ " "+complClassJsonRawValuesMacro[macroIndexSlice].patient_nums);
@@ -621,6 +697,7 @@ function drawCharts() {
 
 	function selectComorbHandlerMicro(e) {
 		var selectedMicro = comorb_chart_micro.getSelection();
+		totPzSelected = comorbidityDataDetail.getValue(selectedMicro[0].row, 1);
 		var microIndexSlice = selectedMicro[0].row;
 		var selectedStringMicro = comorbidityDataDetail.getValue(selectedMicro[0].row,0);
 		//alert('A table row was selected from Micro '+microIndexSlice+ " "+complClassJsonRawValuesMicro[microIndexSlice].patient_nums);
@@ -652,6 +729,7 @@ function drawCharts() {
 
 	function selectComorbHandlerNV(e) {
 		var selectedNV = comorb_chart_nv.getSelection();
+		totPzSelected = comorbidityDataDetail.getValue(selectedNV[0].row, 1);
 		var nvIndexSlice = selectedNV[0].row;
 		var selectedStringNV = comorbidityDataDetail.getValue(selectedNV[0].row,0);
 		//alert('A table row was selected from Non Vascular '+nvIndexSlice+ " "+complClassJsonRawValuesNonVascular[nvIndexSlice].patient_nums);
@@ -1109,7 +1187,11 @@ function drawProcessChart(data){
 			var start = 0;
 			var path = obj.histories[i];
 			for(j=0;j<path.steps.length;j++){
-				dataTableLOC.setCell(row, 0, path.label);
+				var mypathlabel = path.label.replace(/_/g,' ');
+				mypathlabel = mypathlabel.replace("story ", "");
+				mypathlabel = mypathlabel.concat(" (").concat(path.steps[j].n_pts).concat("/").concat(totPzSelected).concat(" pz)");
+				//dataTableLOC.setCell(row, 0, path.label);
+				dataTableLOC.setCell(row, 0, mypathlabel);
 				dataTableLOC.setCell(row, 1, path.steps[j].label);
 				dataTableLOC.setCell(row, 2, start*FROM_MS_TO_DAY);
 				dataTableLOC.setCell(row, 3, (start+parseInt(path.steps[j].time))*FROM_MS_TO_DAY);
@@ -1197,7 +1279,11 @@ function drawProcessChart(data){
 			var start = 0;
 			var path = obj.histories[i];
 			for(j=0;j<path.steps.length;j++){
-				dataTableCVR.setCell(row, 0, path.label);
+				var mypathlabel = path.label.replace(/_/g,'-');
+				mypathlabel = mypathlabel.replace("story-", "");
+				mypathlabel = mypathlabel.concat(" (").concat(path.steps[j].n_pts).concat("/").concat(totPzSelected).concat(" pz)");
+				//dataTableCVR.setCell(row, 0, path.label);
+				dataTableCVR.setCell(row, 0, mypathlabel);
 				dataTableCVR.setCell(row, 1, path.steps[j].label);
 				dataTableCVR.setCell(row, 2, start*FROM_MS_TO_DAY);
 				dataTableCVR.setCell(row, 3, (start+parseInt(path.steps[j].time))*FROM_MS_TO_DAY);
@@ -1307,7 +1393,11 @@ function drawProcessChart(data){
 			var start = 0;
 			var path = obj.histories[i];
 			for(j=0;j<path.steps.length;j++){
-				dataTableHOSPITALIZATION.setCell(row, 0, path.label);
+				var mypathlabel = path.label.replace(/_/g,' ');
+				mypathlabel = mypathlabel.replace("story ", "");
+				mypathlabel = mypathlabel.concat(" (").concat(path.steps[j].n_pts).concat("/").concat(totPzSelected).concat(" pz)");
+				//dataTableHOSPITALIZATION.setCell(row, 0, path.label);
+				dataTableHOSPITALIZATION.setCell(row, 0, mypathlabel);
 				dataTableHOSPITALIZATION.setCell(row, 1, path.steps[j].label);
 				dataTableHOSPITALIZATION.setCell(row, 2, start*FROM_MS_TO_DAY);
 				dataTableHOSPITALIZATION.setCell(row, 3, (start+parseInt(path.steps[j].time))*FROM_MS_TO_DAY);
@@ -1419,7 +1509,14 @@ function drawProcessChart(data){
 			var path = obj.histories[i];
 			for(j=0;j<path.steps.length;j++){
 				if(path.steps[j].label!='wait'){
-					dataTableDRUG.setCell(row, 0, path.label);
+					var mypathlabel = path.label.replace(/_/g,' ');
+					mypathlabel = mypathlabel.replace("story ", "");
+					var pazString = "(";
+					pazString = pazString.concat(path.steps[j].n_pts).concat("/").concat(totPzSelected).concat(" pz) ");
+					//mypathlabel = mypathlabel.concat(" (").concat(path.steps[j].n_pts).concat("/").concat(totPzSelected).concat(" pz)");
+					mypathlabel = pazString.concat(mypathlabel);
+					//dataTableDRUG.setCell(row, 0, path.label);
+					dataTableDRUG.setCell(row, 0, mypathlabel);
 					dataTableDRUG.setCell(row, 1, path.steps[j].label);
 					dataTableDRUG.setCell(row, 2, start*FROM_MS_TO_DAY);
 					dataTableDRUG.setCell(row, 3, (start+parseInt(path.steps[j].time))*FROM_MS_TO_DAY);
@@ -1517,14 +1614,15 @@ function drawProcessChart(data){
 				var historyOneStepData = data.historyOneStepArray;
 				var myHtmlOneStep ='<div id=historyDivOneCount>'+
 				'<div class="chart_title">Histories with one complication</div>'+
-				'<table class="example-table3" border="1"><tr><th>Complication</th><th>Number of patients</th></tr>';		
+				'<table class="example-table3" border="1"><tr><th>Complication</th><th>Number of patients/Total selected patients</th></tr>';
 				for (var i = 0; i < historyOneStepData.length; i++) {
 					var historyOneStep = historyOneStepData[i];
-					myHtmlOneStep = myHtmlOneStep.concat("<tr><td>"+historyOneStep.historyName+"</td><td>"+historyOneStep.patientCounter+"</td></tr>");
+					myHtmlOneStep = myHtmlOneStep.concat("<tr><td>"+historyOneStep.historyName+"</td><td>"+historyOneStep.patientCounter+"/"+totPzSelected+"</td></tr>");
 				}
 				myHtmlOneStep = myHtmlOneStep.concat('</table></div>'); 
 				$("#prova_post").append(myHtmlOneStep);
 				var hNames = data.h_names;
+				var pzTotHNames = data.pz_tot_h_names;
 				optionalInfoComplication = data.optionalInfo;
 
 
@@ -1534,16 +1632,18 @@ function drawProcessChart(data){
 				var first2display = true;
 				for (var i = 0; i < hNames.length; i++) {
 					var historyName = hNames[i];
+					//replace(/_/g,'<br> &#8594 ')
+					var historyName2display = hNames[i].replace(/([A-Z])/g, ' $1').trim().concat(" ").concat(pzTotHNames[i]).concat("/").concat(totPzSelected);
 					var dataChart = complicationDataPost.complicationChart[i];
 					if(dataChart.cols.length>4 || (dataChart.cols.length==4 && dataChart.rows.length>1)){
 						if(first2display){
 							myHtml = myHtml.concat("<td><div  class='hSelected historyItem' onclick='handleClickH($(\"#"+historyName+"_"+i+"\"));'  id='"+historyName+"_"+i+"' >"
-									+historyName+"</div></td>");
+									+historyName2display+"</div></td>");
 							historySelected = i;
 							first2display=false;
 						}else{
 							myHtml = myHtml.concat("<td><div  class='hUnselected historyItem' onclick='handleClickH($(\"#"+historyName+"_"+i+"\"));'  id='"+historyName+"_"+i+"' >"
-									+historyName+"</div></td>");
+									+historyName2display+"</div></td>");
 						}
 					}
 				}	

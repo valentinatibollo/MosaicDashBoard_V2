@@ -102,6 +102,9 @@ public class I2B2Servlet extends HttpServlet{
 			}else if (chartType.equalsIgnoreCase("bmi_pie")){
 				log.info(sessionId+ "/GeneralChart_Selection/Get/BMIPieChart");
 				out.println(getI2B2BMIPIEData());
+			}else if (chartType.equalsIgnoreCase("hba1c")){
+				log.info(sessionId+ "/GeneralChart_Selection/Get/HBA1CPieChart");
+				out.println(getI2B2Hba1cData());
 			}
 		}else if(step.equalsIgnoreCase("configure_session")){
 			//out.println(req.getSession().getId());
@@ -1252,6 +1255,179 @@ public class I2B2Servlet extends HttpServlet{
 
 				row_1.put("v", key);
 				row_2.put("v", bmiMap.get(key));
+				row_arr.add(row_1);
+				row_arr.add(row_2);
+
+				row_obj.put("c",row_arr);
+				rows.add(row_obj);
+
+				JSONObject raw_data= new JSONObject();
+				raw_data.put("id", key);
+				raw_data.put("patient_nums", patientNumsMap.get(key));
+
+				raw_values.add(raw_data);
+			}
+			chart_json.put("rows", rows);
+
+			StringWriter out = new StringWriter();
+			obj.writeJSONString(out);
+			jsonText = out.toString();
+			//System.out.print(jsonText);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally{
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			try {
+				if(rs != null){
+					rs.close();
+				}
+				if(pstmt != null){
+					pstmt.close();
+				}
+				if(conn != null){
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return jsonText;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getI2B2Hba1cData(){
+
+		int class_i = 0;
+		int class_ii = 0;
+		int class_iii = 0;
+		int class_iv = 0;
+		int class_v = 0;
+
+		String patient_class_i = "";
+		String patient_class_ii = "";
+		String patient_class_iii = "";
+		String patient_class_iv = "";
+		String patient_class_v = "";
+
+		Properties prop = new Properties();
+		InputStream input = null;
+		String jsonText = null; 
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		List<Integer> patientList = new ArrayList<Integer>();
+
+		try {
+			String path = getServletContext().getInitParameter("mosaic_i2b2_properties");
+			input = getServletContext().getResourceAsStream(path);
+
+			prop.load(input);
+
+			String sql = "select q1.PATIENT_NUM, q1.START_DATE, q1.NVAL_NUM " +
+					"from "+observationTable+" q1 " +
+					"where q1.CONCEPT_CD in (?) " +
+					"order by q1.PATIENT_NUM, q1.START_DATE desc";
+
+			conn = DBUtil.getI2B2Connection();
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, prop.getProperty("hba1c"));
+
+			rs = pstmt.executeQuery();
+
+			JSONObject obj = new JSONObject();
+			JSONArray raw_values = new JSONArray(); 
+			JSONObject chart_json = new JSONObject();
+
+			obj.put("raw_values", raw_values);
+			obj.put("chart_json", chart_json);
+
+			JSONArray cols = new JSONArray();
+
+			JSONObject col_1 = new JSONObject();
+			col_1.put("id", 1);
+			col_1.put("label", "Hba1cRange");
+			col_1.put("type", "string");
+
+			JSONObject col_2 = new JSONObject();
+			col_2.put("id", 2);
+			col_2.put("label", "Count");
+			col_2.put("type", "number");
+
+			cols.add(col_1);
+			cols.add(col_2);
+
+			chart_json.put("cols", cols);
+
+			JSONArray rows = new JSONArray();
+
+			while(rs.next()){
+				double hba1c = rs.getDouble(3);
+//				int class_i = 0;
+//				int class_ii = 0;
+//				int class_iii = 0;
+//				int class_iv = 0;
+//				int class_v = 0;
+				if(!patientList.contains(rs.getInt(1))){
+					if(hba1c<53.00){
+						class_i++;
+						patient_class_i = patient_class_i.concat("-").concat(Integer.toString(rs.getInt(1)));
+					}
+					else if(hba1c>=53.00 && hba1c<64.00){
+						class_ii++;
+						patient_class_ii = patient_class_ii.concat("-").concat(Integer.toString(rs.getInt(1)));
+					}
+					else if(hba1c>=64.00 && hba1c<75.00){
+						class_iii++;
+						patient_class_iii = patient_class_iii.concat("-").concat(Integer.toString(rs.getInt(1)));
+					}
+					else if(hba1c>=75.00 && hba1c<86.00){
+						patient_class_iv = patient_class_iv.concat("-").concat(Integer.toString(rs.getInt(1)));
+						class_iv++;
+					}
+					else if(hba1c>=86.00){
+						class_v++;
+						patient_class_v = patient_class_v.concat("-").concat(Integer.toString(rs.getInt(1)));
+					}
+					patientList.add(rs.getInt(1));
+				}
+			}
+
+
+			LinkedHashMap<String, Integer> hba1cMap = new LinkedHashMap<String, Integer>();
+			hba1cMap.put("<53 mmol/mol", class_i);
+			hba1cMap.put("[53-64) mmol/mol", class_ii);
+			hba1cMap.put("[64-75) mmol/mol", class_iii);
+			hba1cMap.put("[75-86) mmol/mol", class_iv);
+			hba1cMap.put(">= 86 mmol/mol", class_v);
+
+			LinkedHashMap<String, String> patientNumsMap = new LinkedHashMap<String, String>();
+			patientNumsMap.put("<53 mmol/mol", patient_class_i);
+			patientNumsMap.put("[53-64) mmol/mol", patient_class_ii);
+			patientNumsMap.put("[64-75) mmol/mol", patient_class_iii);
+			patientNumsMap.put("[75-86) mmol/mol", patient_class_iv);
+			patientNumsMap.put(">= 86 mmol/mol", patient_class_v);
+
+			Set<String> keys = hba1cMap.keySet();
+
+			for(String key : keys){
+				JSONArray row_arr = new JSONArray();
+				JSONObject row_obj = new JSONObject();
+
+				JSONObject row_1 = new JSONObject();
+				JSONObject row_2 = new JSONObject();
+
+				row_1.put("v", key);
+				row_2.put("v", hba1cMap.get(key));
 				row_arr.add(row_1);
 				row_arr.add(row_2);
 
@@ -3240,7 +3416,7 @@ public class I2B2Servlet extends HttpServlet{
 			StringWriter out = new StringWriter();
 			obj.writeJSONString(out);
 			jsonText = out.toString();
-			//			System.out.println(jsonText);
+			//System.out.println(jsonText);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -8180,12 +8356,18 @@ public class I2B2Servlet extends HttpServlet{
 			//object principale
 			JSONObject jsonResultContainer = new JSONObject();
 			JSONArray historyNames = new JSONArray();
+			JSONArray pzTot4historyNames = new JSONArray();
 			//Cerco il primo token della history per costruire un json per ogni storia (raggruppate per primo token)
 			List<Integer> storyLengthList = new ArrayList<Integer>(); //quante storie ci sono che cominciano con quel token (cioè quante serie devo fare)
+			List<Integer> pz4StoryList = new ArrayList<Integer>(); //quanti pz in ogni storia che comincia con quel token
 			Integer storyLength = 0;
+			Integer pz4Story = 0;
 			for(int i=0; i < histories.size(); i++){
 				JSONObject history = (JSONObject) histories.get(i);
 				String historyName = (String) history.get("label");
+				JSONArray steps = (JSONArray) history.get("steps");	
+				JSONObject step = (JSONObject)steps.get(0); //prendo nPts dal primo step xke npts è uguale in tutti gli step
+				Integer nPts = ((Long)step.get("n_pts")).intValue();
 				String[] historyNameSplit = historyName.split("_");
 				String firstToken = historyNameSplit[1]; //xke 0: "story"
 				if(!historyNames.contains(firstToken)){
@@ -8193,17 +8375,30 @@ public class I2B2Servlet extends HttpServlet{
 					if(i>0){
 						storyLengthList.add(storyLength);
 						storyLength=0;
+						pz4StoryList.add(pz4Story);
+						pz4Story = 0;
 					}
 				}
+				if(historyNameSplit.length>2)pz4Story = pz4Story+nPts; //non sommo nPts delle storie con un solo token (xke sono gestite a parte)
 				storyLength++;
 			}
 			storyLengthList.add(storyLength); //aggiungo l'ultimo
+			pz4StoryList.add(pz4Story);//aggiungo l'ultimo
 			jsonResultContainer.put("h_names", historyNames);
+			
+			for(int h=0; h<historyNames.size(); h++){
+				pzTot4historyNames.add(pz4StoryList.get(h));
+				//System.out.println(historyNames.get(h)+" tot: "+pz4StoryList.get(h));
+				//							System.out.println(historyNames.get(h));
+				//							System.out.println(storyLengthList.get(h));
+			}
+			
 			//			for(int h=0; h<historyNames.size(); h++){
 			//				System.out.println(historyNames.get(h));
 			//				System.out.println(storyLengthList.get(h));
 			//			}
 			//
+			jsonResultContainer.put("pz_tot_h_names", pzTot4historyNames);
 			JSONArray stepsArray = new JSONArray();
 			JSONArray optionalInfosArrayOuter = new JSONArray();
 			JSONArray optionalInfosArrayInner = new JSONArray();
@@ -8225,7 +8420,7 @@ public class I2B2Servlet extends HttpServlet{
 					JSONArray onestep = (JSONArray) history.get("steps");	
 					JSONArray patientArray = (JSONArray) ((JSONObject) onestep.get(0)).get("patients");
 					JSONObject historyOneStep = new JSONObject();
-					historyOneStep.put("historyName", historyNameSplit[1]);
+					historyOneStep.put("historyName", historyNameSplit[1].replaceAll("(.)([A-Z])", "$1 $2"));
 					historyOneStep.put("patientCounter", patientArray.size());
 					historyOneStepArray.add(historyOneStep);
 				}
@@ -8394,15 +8589,18 @@ public class I2B2Servlet extends HttpServlet{
 									row_2.put("v", yStep*childNumber);
 								}
 								JSONObject row_tooltip = new JSONObject();
+								String labelReplaced = (String) step.get("label");
+								labelReplaced = labelReplaced.replaceAll("(.)([A-Z])", "$1 $2");
 								if(j==0){
-									row_tooltip.put("v", step.get("label")+" \n N.paz: "+step.get("n_pts"));
+									row_tooltip.put("v", labelReplaced+" \n N.paz: "+step.get("n_pts"));
 								}else{
 									JSONObject previousStep = (JSONObject)steps.get(j-1);
-									row_tooltip.put("v", step.get("label")+" - Days from last step: "+
+									row_tooltip.put("v", labelReplaced+" - Days from last step: "+
 											previousStep.get("time")+" - Days from first step: "+timeToAdd+"\n N.paz: "+previousStep.get("n_pts"));
 								}								
 								JSONObject row_annotation = new JSONObject();
-								row_annotation.put("v", step.get("label"));									
+								
+								row_annotation.put("v", labelReplaced);									
 								row_arr.add(row_2);
 								row_arr.add(row_tooltip);
 								row_arr.add(row_annotation);
