@@ -3409,7 +3409,7 @@ function designTrafficLights(){
 //						}
 
 						if(tldata.retinopaty){
-							mvr_r_string = '<div class="tf_comorbidity" align="center">Retinopaty: '+tldata.retinopaty+'</div><br>';
+							mvr_r_string = '<div class="tf_comorbidity" align="center">Retinopathy: '+tldata.retinopaty+'</div><br>';
 							if(mvrRtracker){
 								mvrRtracker = false;
 								mvr_r_difference = tldata.traffic_light_array[i].category;
@@ -3448,7 +3448,7 @@ function designTrafficLights(){
 //						addTrend($('#mvr_ne_tl'), mvr_ne_difference,mvrNetracker);
 //						}		
 						if(tldata.nephropaty){
-							mvr_ne_string = '<div class="tf_comorbidity" align="center">Nephropaty: '+tldata.nephropaty+'</div><br>';
+							mvr_ne_string = '<div class="tf_comorbidity" align="center">Nephropathy: '+tldata.nephropaty+'</div><br>';
 							if(mvrNetracker){
 								mvrNetracker = false;
 								mvr_ne_difference = tldata.traffic_light_array[i].category;
@@ -3487,7 +3487,7 @@ function designTrafficLights(){
 //						}
 
 						if(tldata.neuropaty){
-							mvr_nu_string = '<div class="tf_comorbidity" align="center">Neuropaty: '+tldata.neuropaty+'</div><br>';
+							mvr_nu_string = '<div class="tf_comorbidity" align="center">Neuropathy: '+tldata.neuropaty+'</div><br>';
 							if(mvrNutracker){
 								mvrNutracker = false;
 								mvr_nu_difference = tldata.traffic_light_array[i].category;
@@ -3596,7 +3596,7 @@ function openUC3Chart(callerId){
 				scatter_chart.draw(scatterChartData, scatterChartOptions);
 
 				$( "#dialogUC3chart" ).dialog({
-					title: "Hba1b"
+					title: "Hba1c"
 				});
 
 				$( "#dialogUC3chart" ).dialog("open");
@@ -3767,7 +3767,7 @@ function openUC3Chart(callerId){
 				if(scatterChartData.getNumberOfRows()==0){
 					$('#dialogUC3chart_chart').html("<div>The patient develops the complication before the first follow Up.</div>");
 					$( "#dialogUC3chart" ).dialog({
-						title: "Microvascular Risk: Retinopaty"
+						title: "Microvascular Risk: Retinopathy"
 					});
 
 					$( "#dialogUC3chart" ).dialog("open");
@@ -3791,7 +3791,7 @@ function openUC3Chart(callerId){
 					scatter_chart.draw(scatterChartData, scatterChartOptions);
 
 					$( "#dialogUC3chart" ).dialog({
-						title: "Microvascular Risk: Retinopaty"
+						title: "Microvascular Risk: Retinopathy"
 					});
 
 					$( "#dialogUC3chart" ).dialog("open");
@@ -3829,7 +3829,7 @@ function openUC3Chart(callerId){
 				scatter_chart.draw(scatterChartData, scatterChartOptions);
 
 				$( "#dialogUC3chart" ).dialog({
-					title: "Microvascular Risk: Nephropaty"
+					title: "Microvascular Risk: Nephropathy"
 				});
 
 				$( "#dialogUC3chart" ).dialog("open");
@@ -3866,7 +3866,7 @@ function openUC3Chart(callerId){
 				scatter_chart.draw(scatterChartData, scatterChartOptions);
 
 				$( "#dialogUC3chart" ).dialog({
-					title: "Microvascular Risk: Neuropaty"
+					title: "Microvascular Risk: Neuropathy"
 				});
 
 				$( "#dialogUC3chart" ).dialog("open");
